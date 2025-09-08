@@ -1,18 +1,19 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import React from "react";
+import { Routes, Route } from "react-router-dom";
+import Layout from "./components/Layout.jsx";
+import Dashboard from "./components/Dashboard.jsx";
+import Employee from "./pages/Employee.jsx";
+import Log from "./pages/Log.jsx";
 
-function App() {
-  const [count, setCount] = useState(0)
-
+export default function App() {
   return (
-    <>
-      <h1 class="text-3xl font-bold ">
-    Hello world!
-  </h1>
-    </>
-  )
+    <Routes>
+      <Route path="/" element={<Layout />}>
+        <Route path="dashboard" element={<Dashboard />} />
+        <Route path="employee" element={<Employee />} />
+        <Route path="log" element={<Log />} />
+        <Route path="*" element={<Dashboard />} /> {/* default */}
+      </Route>
+    </Routes>
+  );
 }
-
-export default App
