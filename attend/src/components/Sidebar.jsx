@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import AddEmployeeModal from "./modals/AddEmployeeModal";
+import Employee from "../pages/Employee/";
 import { Plus } from "lucide-react";
 
 export default function Sidebar() {
@@ -12,9 +12,7 @@ export default function Sidebar() {
     <aside className="w-64 bg-[#0f0b0b] text-white min-h-screen p-6 relative">
       <div className="text-2xl font-bold mb-6 flex justify-between items-center">
         Attendo
-        <button onClick={() => setOpenModal(true)}>
-          <Plus className="w-6 h-6 text-green-400 hover:text-green-600" />
-        </button>
+       
       </div>
 
       <nav className="space-y-3 text-sm">

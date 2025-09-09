@@ -1,57 +1,32 @@
 import express from "express";
-import http from "http";
-import { Server as IOServer } from "socket.io";
+import mongoose from "mongoose";
 import cors from "cors";
-import dotenv from "dotenv";
-import connectDB from "./config/db.js";
+import path from "path";
 import employeeRoutes from "./routes/employee.js";
-import attendanceRoutes from "./routes/attendance.js";
-import seedRoutes from "./routes/seed.js";
-
-dotenv.config();
 
 const app = express();
-const server = http.createServer(app);
-
-const io = new IOServer(server, {
-  cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
-});
-
-// Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+app.use(cors());
 app.use(express.json());
+
+// ✅ Serve uploads folder
+app.use("/uploads", express.static(path.join(process.cwd(), "backend/uploads")));
+
+// ✅ Routes
 app.use("/api/employees", employeeRoutes);
 
-// Attach io to req
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
-
-// Routes
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/seed", seedRoutes);
-
-// Root route
 app.get("/", (req, res) => {
-  res.send("✅ AutoAttend API Running...");
+  res.send("Backend is running...");
 });
 
-// Socket.io events
-io.on("connection", (socket) => {
-  console.log("⚡ Socket connected:", socket.id);
-  socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
-  });
-});
+// ✅ MongoDB connect
+mongoose
+  .connect("mongodb://127.0.0.1:27017/attendpro", {
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+  })
+  .then(() => console.log("✅ MongoDB Connected"))
+  .catch((err) => console.error("❌ MongoDB Error:", err));
 
-// Start server after DB connection
-const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
+app.listen(5000, () => {
+  console.log("🚀 Server running on port 5000");
 });

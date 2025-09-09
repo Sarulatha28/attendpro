@@ -1,63 +1,59 @@
-// backend/routes/employee.js
 import express from "express";
 import multer from "multer";
-import bcrypt from "bcryptjs";
 import Employee from "../models/Employee.js";
+import path from "path";
 
 const router = express.Router();
 
-// configure multer for photo upload
+// ✅ Multer storage
 const storage = multer.diskStorage({
-  destination: (req, file, cb) => cb(null, "uploads/"),
-  filename: (req, file, cb) =>
-    cb(null, Date.now() + "-" + file.originalname),
+  destination: (req, file, cb) => {
+    cb(null, "backend/uploads/");
+  },
+  filename: (req, file, cb) => {
+    cb(null, Date.now() + path.extname(file.originalname));
+  },
 });
 const upload = multer({ storage });
 
-// POST /api/employees
+// ✅ Add employee
 router.post("/", upload.single("profilePhoto"), async (req, res) => {
   try {
-    const {
-      name,
-      email,
-      password,
-      phone,
-      gender,
-      age,
-      adhaar,
-      bankAccount,
-      ifsc,
-      experience,
-      education,
-      employeeId,
-      companyId,
-    } = req.body;
-
-    // hash password
-    const passwordHash = await bcrypt.hash(password, 10);
-
     const newEmployee = new Employee({
-      name,
-      email,
-      passwordHash,
-      phone,
-      gender,
-      age,
-      adhaar,
-      bankAccount,
-      ifsc,
-      experience,
-      education,
-      employeeId,
-      companyId,
-      profilePhoto: req.file ? req.file.filename : null,
+      ...req.body,
+      profilePhoto: req.file ? req.file.filename : null, // store filename only
     });
 
     await newEmployee.save();
-    res.status(201).json({ message: "Employee added successfully", newEmployee });
+    res
+      .status(201)
+      .json({ message: "✅ Employee added successfully", employee: newEmployee });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: "Error adding employee" });
+    res
+      .status(400)
+      .json({ message: "❌ Error adding employee", error: err.message });
+  }
+});
+
+// ✅ Get all employees
+router.get("/", async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    res.status(500).json({ message: "❌ Error fetching employees" });
+  }
+});
+
+// ✅ Get employee by ID
+router.get("/:id", async (req, res) => {
+  try {
+    const employee = await Employee.findById(req.params.id);
+    if (!employee)
+      return res.status(404).json({ message: "Employee not found" });
+    res.json(employee);
+  } catch (err) {
+    res.status(500).json({ message: "❌ Error fetching employee" });
   }
 });
 

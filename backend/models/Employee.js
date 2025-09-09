@@ -1,21 +1,30 @@
-// backend/models/Employee.js
 import mongoose from "mongoose";
 
-const employeeSchema = new mongoose.Schema({
-  name: { type: String, required: true },
-  email: { type: String, required: true },
-  passwordHash: { type: String, required: true },
-  phone: String,
-  gender: String,
-  age: Number,
-  adhaar: String,
-  bankAccount: String,
-  ifsc: String,
-  experience: String,
-  education: String,
-  profilePhoto: String, // store filename or cloud URL
-  employeeId: { type: String, required: true },
-  companyId: { type: String, required: true, index: true },
-});
+const employeeSchema = new mongoose.Schema(
+  {
+    name: { type: String, required: true },
+    employeeId: { type: String, required: true, unique: true },
+    email: { type: String },
 
-export default mongoose.model("Employee", employeeSchema);
+    // ✅ Safe as Number
+    phone: { type: Number },
+    age: { type: Number },
+
+    // ✅ Aadhaar (12 digits) → string safer
+    aadhaarNumber: { type: String },
+
+    // ✅ Bank account can be >15 digits → must be string
+    bankAccount: { type: String },
+
+    gender: { type: String },
+    education: { type: String },
+    experience: { type: String },
+    ifsc: { type: String },
+    panNumber: { type: String },
+    profilePhoto: { type: String },
+  },
+  { timestamps: true }
+);
+
+const Employee = mongoose.model("Employee", employeeSchema);
+export default Employee;

@@ -1,17 +1,15 @@
+// backend/db.js
 import mongoose from "mongoose";
 
 const connectDB = async () => {
   try {
-    const conn = await mongoose.connect(
-      process.env.MONGO_URI || "mongodb://127.0.0.1:27017/autoattend",
-      {
-        useNewUrlParser: true,
-        useUnifiedTopology: true,
-      }
-    );
-    console.log(`✅ MongoDB Connected: ${conn.connection.host}`);
+    await mongoose.connect(process.env.MONGO_URI || "mongodb://127.0.0.1:27017/attendpro", {
+      useNewUrlParser: true,
+      useUnifiedTopology: true,
+    });
+    console.log("✅ MongoDB Connected");
   } catch (err) {
-    console.error("❌ DB connection error:", err.message);
+    console.error("❌ MongoDB Error:", err.message);
     process.exit(1);
   }
 };
