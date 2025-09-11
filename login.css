@@ -1,0 +1,97 @@
+/* General Reset */
+* { margin:0; padding:0; box-sizing:border-box; font-family: Arial, sans-serif; }
+
+body, html { height: 100%; }
+
+/* Background Video */
+#bg-video {
+  position: fixed; top:0; left:0;
+  width:100%; height:100%; object-fit:cover;
+  z-index:-2;
+}
+/* Login Container */
+
+/* Overlay */
+.overlay {
+  position: fixed; top:0; left:0; width:100%; height:100%;
+  background: rgba(0,0,0,0.6);
+  z-index:-1;
+}
+
+/* Login Container */
+.login-container {
+  position: absolute;
+  top:50%; left:50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  color:#fff;
+  width: 360px;
+}
+
+/* Tabs */
+.tab-buttons, .form-tabs {
+  display: flex; justify-content: center; margin-bottom: 20px;
+  gap: 5px;
+}
+.tab-buttons button, .form-tabs button {
+  flex:1; padding:12px; border:none; border-radius:8px;
+  background:#e0e0e0; cursor:pointer; font-weight:bold; transition:0.3s;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+}
+.tab-buttons button.active, .form-tabs button.active { background:#4facfe; color:#fff; }
+
+/* Form Card - Employee & Admin */
+.form-card,
+.admin-form {
+  background: #ffffff69; 
+  padding: 30px 25px; 
+  border-radius: 15px;
+  box-shadow: 0 10px 25px rgba(0,0,0,0.2); 
+  display:flex; 
+  flex-direction: column;
+  gap: 15px; /* spacing between inputs/buttons */
+  width: 100%;
+}
+
+/* Form Elements */
+.form-card input,
+.form-card select,
+.admin-form input,
+.admin-form select {
+  padding: 14px; 
+  border-radius: 8px; 
+  border:1px solid #cccccc;
+  font-size: 14px; 
+  width: 100%;
+  display: block;
+  transition: 0.3s;
+}
+.form-card input:focus,
+.form-card select:focus,
+.admin-form input:focus,
+.admin-form select:focus {
+  border-color: #4facfe; 
+  outline: none; 
+  box-shadow: 0 0 5px rgba(79,172,254,0.5);
+}
+
+/* Buttons */
+.form-card button,
+.admin-form button {
+  padding: 14px; 
+  border:none; 
+  border-radius:10px; 
+  background:#4facfed2;
+  color:#ffffff; 
+  font-weight:bold; 
+  cursor:pointer; 
+  width: 100%;
+  transition:0.3s;
+}
+.form-card button:hover,
+.admin-form button:hover { 
+  background:#00f1fea8; 
+}
+
+/* Responsive */
+@media(max-width:400px) { .login-container { width:90%; } }
