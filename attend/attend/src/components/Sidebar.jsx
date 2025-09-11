@@ -1,12 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-<<<<<<< HEAD
-
-
-=======
 import Employee from "../pages/EmployeeCard";
->>>>>>> a43ee5e50977a1a76fc4c8d6bc1fae1ec9cad9ce
 import { Plus } from "lucide-react";
 
 export default function Sidebar() {
