@@ -1,57 +1,54 @@
-import express from "express";
-import http from "http";
-import { Server as IOServer } from "socket.io";
-import cors from "cors";
-import dotenv from "dotenv";
-import connectDB from "./config/db.js";
-import employeeRoutes from "./routes/employee.js";
-import attendanceRoutes from "./routes/attendance.js";
-import seedRoutes from "./routes/seed.js";
+import express from 'express';
+import { createServer } from "http";
+import { Server } from 'socket.io';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import employeeRoutes from './routes/employee.js';
+import companyRoutes from './routes/company.js';
+import attendanceRoutes from './routes/attendance.js';
 
 dotenv.config();
-
 const app = express();
-const server = http.createServer(app);
+const server = createServer(app);
 
-const io = new IOServer(server, {
+// ✅ create socket.io only once
+const io = new Server(server, {
   cors: {
-    origin: process.env.FRONTEND_URL || "http://localhost:5173",
-    methods: ["GET", "POST"],
-  },
+    origin: "http://localhost:5173", // frontend
+    methods: ["GET", "POST"]
+  }
 });
 
-// Middleware
-app.use(cors({ origin: process.env.FRONTEND_URL || "http://localhost:5173" }));
+// ✅ expose io so routes can emit
+app.set('io', io);
+
+// Middlewares
+app.use(cors());
 app.use(express.json());
-app.use("/api/employees", employeeRoutes);
-
-// Attach io to req
-app.use((req, res, next) => {
-  req.io = io;
-  next();
-});
 
 // Routes
-app.use("/api/attendance", attendanceRoutes);
-app.use("/api/seed", seedRoutes);
+app.use('/api/employees', employeeRoutes);
+app.use('/api/company', companyRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
-// Root route
-app.get("/", (req, res) => {
-  res.send("✅ AutoAttend API Running...");
-});
-
-// Socket.io events
+// ✅ Socket.io events
 io.on("connection", (socket) => {
-  console.log("⚡ Socket connected:", socket.id);
+  console.log("Client connected:", socket.id);
+
   socket.on("disconnect", () => {
-    console.log("❌ Socket disconnected:", socket.id);
+    console.log("Client disconnected:", socket.id);
   });
 });
 
-// Start server after DB connection
+// ✅ MongoDB connect
+const MONGO = process.env.MONGO_URI || 'mongodb://localhost:27017/attenddb';
+mongoose.connect(MONGO)
+  .then(() => console.log('MongoDB connected'))
+  .catch(console.error);
+
+// ✅ Run server only once
 const PORT = process.env.PORT || 5000;
-connectDB().then(() => {
-  server.listen(PORT, () => {
-    console.log(`🚀 Server running on port ${PORT}`);
-  });
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
