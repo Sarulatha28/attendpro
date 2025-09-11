@@ -1,18 +1,21 @@
-import React from "react";
+// src/App.jsx
 import { Routes, Route } from "react-router-dom";
-import Layout from "./components/Layout.jsx";
-import Dashboard from "./components/Dashboard.jsx";
-import Employee from "./pages/Employee.jsx";
-import Log from "./pages/Log.jsx";
+import Layouts from "./components/Layouts"; // ✅ Correct import
+import Attendance from "./pages/Attanance"; // ✅ fixed typo
+import Profile from "./pages/Profile";
+import EmployeeDashboard from "./components/EmployeeDashboard";
+import ApplyLeave from "./pages/ApplyLeave";
+
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<Layout />}>
-        <Route path="dashboard" element={<Dashboard />} />
-        <Route path="employee" element={<Employee />} />
-        <Route path="log" element={<Log />} />
-        <Route path="*" element={<Dashboard />} /> {/* default */}
+      {/* ✅ Wrap all employee pages in Layout */}
+      <Route path="/" element={<Layouts />}>
+        <Route path="dashboard" element={<EmployeeDashboard />} />
+        <Route path="attendance" element={<Attendance />} />
+<Route path="leave-requests" element={<ApplyLeave/>} />
+        <Route path="profile" element={<Profile />} />
       </Route>
     </Routes>
   );
