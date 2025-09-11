@@ -1,48 +1,25 @@
-import { useEffect, useState } from "react";
-import axios from "axios";
-import Employee from './Employee';
-
-export default function Employeedetails() {
-  const [employees, setEmployees] = useState([]);
-  const [selected, setSelected] = useState(null);
-
-  const fetchEmployees = async () => {
-    const res = await axios.get("http://localhost:5000/api/employees");
-    setEmployees(res.data);
-  };
-
-  useEffect(() => {
-    fetchEmployees();
-  }, []);
-
+export default function EmployeeDetails({ employee, onClose }) {
   return (
-    <div className="p-6">
-      <h2 className="text-2xl font-bold mb-4">Employees</h2>
-      <div className="flex overflow-x-auto gap-4 mb-6">
-        {employees.map((emp) => (
-          <Employee
-            key={emp._id}
-            employee={emp}
-            onClick={() => setSelected(emp)}
-          />
-        ))}
-      </div>
-
-      {selected && (
-        <div className="bg-gray-900 text-white p-6 rounded-lg">
-          <h3 className="text-xl font-bold mb-2">{selected.name}</h3>
-          <p>Email: {selected.email}</p>
-          <p>Phone: {selected.phone}</p>
-          <p>Employee ID: {selected.employeeId}</p>
-          <p>Age: {selected.age}</p>
-          <p>Gender: {selected.gender}</p>
-          <p>Education: {selected.education}</p>
-          <p>Experience: {selected.experience}</p>
-          <p>Aadhaar: {selected.aadhaarNumber}</p>
-          <p>Bank: {selected.bankAccount}</p>
-          <p>IFSC: {selected.ifsc}</p>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
+      <div className="bg-white p-6 rounded w-full max-w-2xl">
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Employee Details</h2>
+          <button onClick={onClose} className="text-gray-600">Close</button>
         </div>
-      )}
+
+        <div className="flex flex-col md:flex-row gap-6">
+          <img src={employee.photoUrl || "/default-avatar.png"} alt="profile" className="w-48 h-48 object-cover rounded" />
+          <div>
+            <div><strong>Name:</strong> {employee.name}</div>
+            <div><strong>Employee ID:</strong> {employee.employeeId}</div>
+            <div><strong>Email:</strong> {employee.email}</div>
+            <div><strong>Age:</strong> {employee.age}</div>
+            <div><strong>Education:</strong> {employee.education}</div>
+            <div><strong>Experience:</strong> {employee.experience}</div>
+            <div><strong>Company ID:</strong> {employee.companyId}</div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

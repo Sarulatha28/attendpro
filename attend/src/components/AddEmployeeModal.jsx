@@ -1,188 +1,177 @@
 // src/components/AddEmployeeModal.jsx
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
-import { X } from "lucide-react";
 
-export default function AddEmployeeModal({ onClose }) {
+export default function AddEmployeeModal({ onClose, onAdded }) {
   const [form, setForm] = useState({
     name: "",
     email: "",
-    phone: "",
+    password: "",
+    companyId: "",
+    employeeId: "",
     age: "",
-    gender: "",
     education: "",
     experience: "",
-    employeeId: "",
-    aadhaarNumber: "",
-    bankAccount: "",
-    ifsc: "",
-    panNumber: "",
   });
-  const [photo, setPhoto] = useState(null);
+
+  const [imageFile, setImageFile] = useState(null);
   const [preview, setPreview] = useState(null);
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
-
-  const handlePhotoChange = (e) => {
+  // ✅ handle photo upload
+  const handleFile = (e) => {
     const file = e.target.files[0];
-    setPhoto(file);
-    if (file) setPreview(URL.createObjectURL(file));
+    if (file) {
+      setImageFile(file);
+      setPreview(URL.createObjectURL(file)); // preview for round photo
+    }
   };
 
-  const handleSubmit = async (e) => {
-  e.preventDefault();
-  try {
-    const data = new FormData();
-    Object.keys(form).forEach((key) => data.append(key, form[key]));
-    if (photo) data.append("profilePhoto", photo);
+  // ✅ submit form
+  const submit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      const data = new FormData();
+      Object.entries(form).forEach(([k, v]) => data.append(k, v));
+      if (imageFile) data.append("photo", imageFile);
 
-    const res = await axios.post("http://localhost:5000/api/employees", data, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+      const res = await axios.post(
+        import.meta.env.VITE_API_URL + "/employees",
+        data,
+        {
+          headers: { "Content-Type": "multipart/form-data" },
+        }
+      );
 
-    alert(res.data.message); // success message
-    onClose(); // close modal
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.message || "Error adding employee");
-  }
-};
-
+      onAdded && onAdded(res.data);
+      alert("✅ Employee added successfully");
+      onClose();
+    } catch (err) {
+      console.error(err);
+      alert("❌ Error adding employee");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50">
-      <div className="bg-gray-900 text-white w-full h-full p-10 relative overflow-y-auto">
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-5 right-5 text-gray-400 hover:text-white"
-        >
-          <X size={28} />
-        </button>
+    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
+      <div className="bg-white p-6 rounded-lg w-full max-w-xl shadow-lg">
+        {/* Header */}
+        <div className="flex justify-between items-center mb-4">
+          <h2 className="text-lg font-semibold">Add Employee</h2>
+          <button onClick={onClose} className="text-gray-600 hover:text-black">
+            ✕
+          </button>
+        </div>
 
-        <h2 className="text-3xl font-bold mb-8 text-center">Add Employee</h2>
-
-        <form
-          onSubmit={handleSubmit}
-          className="flex flex-col items-center justify-center h-full"
-        >
-          {/* Profile Upload */}
-          <div className="flex flex-col items-center mb-8">
-            <label htmlFor="profilePhoto" className="cursor-pointer">
-              <div className="w-32 h-32 rounded-full overflow-hidden border-4 border-gray-700 flex items-center justify-center">
-                {preview ? (
-                  <img
-                    src={preview}
-                    alt="Profile Preview"
-                    className="w-full h-full object-cover"
-                  />
-                ) : (
-                  <div className="text-gray-400 text-sm">
-                    Click to Add Photo
-                  </div>
-                )}
-              </div>
-            </label>
-            <input
-              id="profilePhoto"
-              type="file"
-              onChange={handlePhotoChange}
-              accept="image/*"
-              className="hidden"
-            />
-          </div>
-
-          {/* Fields */}
-          <div className="grid grid-cols-2 gap-4 w-full max-w-3xl">
-            <input
-              name="name"
-              onChange={handleChange}
-              placeholder="Full Name"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
-            <input
-              name="employeeId"
-              onChange={handleChange}
-              placeholder="Employee ID"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            <input
-              name="email"
-              onChange={handleChange}
-              placeholder="Email"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg col-span-2"
-            />
-            <input
-              name="phone"
-              onChange={handleChange}
-              placeholder="Phone Number"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg col-span-2"
-            />
-            <input
-              name="age"
-              onChange={handleChange}
-              placeholder="Age"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            <select
-              name="gender"
-              onChange={handleChange}
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
+        {/* Form */}
+        <form onSubmit={submit} className="space-y-4">
+          {/* Round photo upload */}
+          <div className="flex flex-col items-center">
+            <label
+              htmlFor="photo"
+              className="cursor-pointer w-32 h-32 rounded-full border-2 border-dashed border-gray-400 flex items-center justify-center overflow-hidden"
             >
-              <option value="">Select Gender</option>
-              <option>Male</option>
-              <option>Female</option>
-              <option>Other</option>
-            </select>
-            <input
-              name="education"
-              onChange={handleChange}
-              placeholder="Education"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            <input
-              name="experience"
-              onChange={handleChange}
-              placeholder="Experience"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            {/* New fields */}
-            <input
-              name="aadhaarNumber"
-              onChange={handleChange}
-              placeholder="Aadhaar Number"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            <input
-              name="bankAccount"
-              onChange={handleChange}
-              placeholder="Bank Account Number"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-            <input
-              name="ifsc"
-              onChange={handleChange}
-              placeholder="IFSC Code"
-              className="bg-gray-800 border border-gray-700 p-3 rounded-lg"
-            />
-           
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-full"
+                />
+              ) : (
+                <span className="text-gray-500 text-sm">+ Add Photo</span>
+              )}
+              <input
+                type="file"
+                id="photo"
+                accept="image/*"
+                onChange={handleFile}
+                className="hidden"
+              />
+            </label>
           </div>
 
-          {/* Buttons at center */}
-          <div className="flex gap-4 mt-10">
+          {/* Input fields */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            <input
+              required
+              placeholder="Name"
+              value={form.name}
+              onChange={(e) => setForm({ ...form, name: e.target.value })}
+              className="border p-2 rounded"
+            />
+            <input
+              required
+              type="email"
+              placeholder="Email"
+              value={form.email}
+              onChange={(e) => setForm({ ...form, email: e.target.value })}
+              className="border p-2 rounded"
+            />
+            <input
+              required
+              type="password"
+              placeholder="Password"
+              value={form.password}
+              onChange={(e) => setForm({ ...form, password: e.target.value })}
+              className="border p-2 rounded"
+            />
+            <input
+              placeholder="Company ID"
+              value={form.companyId}
+              onChange={(e) => setForm({ ...form, companyId: e.target.value })}
+              className="border p-2 rounded"
+            />
+            <input
+              required
+              placeholder="Employee ID"
+              value={form.employeeId}
+              onChange={(e) =>
+                setForm({ ...form, employeeId: e.target.value })
+              }
+              className="border p-2 rounded"
+            />
+            <input
+              placeholder="Age"
+              value={form.age}
+              onChange={(e) => setForm({ ...form, age: e.target.value })}
+              className="border p-2 rounded"
+            />
+            <input
+              placeholder="Education"
+              value={form.education}
+              onChange={(e) =>
+                setForm({ ...form, education: e.target.value })
+              }
+              className="border p-2 rounded"
+            />
+            <input
+              placeholder="Experience"
+              value={form.experience}
+              onChange={(e) =>
+                setForm({ ...form, experience: e.target.value })
+              }
+              className="border p-2 rounded"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-6 py-3 bg-gray-600 rounded-lg hover:bg-gray-700"
+              className="px-4 py-2 rounded border hover:bg-gray-100"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-6 py-3 bg-blue-600 rounded-lg hover:bg-blue-700"
+              disabled={loading}
+              className="px-4 py-2 rounded bg-blue-600 text-white hover:bg-blue-700"
             >
-              Add Employee
+              {loading ? "Adding..." : "Add Employee"}
             </button>
           </div>
         </form>

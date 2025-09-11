@@ -1,30 +1,27 @@
-import mongoose from "mongoose";
+import express from "express";
+import Employee from "../models/Employee.js";
 
-const employeeSchema = new mongoose.Schema(
-  {
-    name: { type: String, required: true },
-    employeeId: { type: String, required: true, unique: true },
-    email: { type: String },
+const router = express.Router();
 
-    // ✅ Safe as Number
-    phone: { type: Number },
-    age: { type: Number },
+// GET all employees
+router.get("/", async (req, res) => {
+  try {
+    const employees = await Employee.find();
+    res.json(employees);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch employees" });
+  }
+});
 
-    // ✅ Aadhaar (12 digits) → string safer
-    aadhaarNumber: { type: String },
+// POST add new employee
+router.post("/", async (req, res) => {
+  try {
+    const employee = new Employee(req.body);
+    await employee.save();
+    res.status(201).json(employee);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
 
-    // ✅ Bank account can be >15 digits → must be string
-    bankAccount: { type: String },
-
-    gender: { type: String },
-    education: { type: String },
-    experience: { type: String },
-    ifsc: { type: String },
-    panNumber: { type: String },
-    profilePhoto: { type: String },
-  },
-  { timestamps: true }
-);
-
-const Employee = mongoose.model("Employee", employeeSchema);
-export default Employee;
+export default router;

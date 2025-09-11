@@ -1,7 +1,7 @@
 // src/components/Sidebar.jsx
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Employee from "../pages/Employee/";
+import Employee from "../pages/EmployeeCard";
 import { Plus } from "lucide-react";
 
 export default function Sidebar() {
@@ -26,7 +26,7 @@ export default function Sidebar() {
           onClick={() => navigate("/employee")}
           className="w-full text-left p-3 rounded hover:bg-[#221616] flex justify-between"
         >
-          Employee
+          EmployeeCard
         </button>
         <button
           onClick={() => navigate("/log")}

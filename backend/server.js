@@ -1,32 +1,54 @@
-import express from "express";
-import mongoose from "mongoose";
-import cors from "cors";
-import path from "path";
-import employeeRoutes from "./routes/employee.js";
+import express from 'express';
+import { createServer } from "http";
+import { Server } from 'socket.io';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import employeeRoutes from './routes/employee.js';
+import companyRoutes from './routes/company.js';
+import attendanceRoutes from './routes/attendance.js';
 
+dotenv.config();
 const app = express();
+const server = createServer(app);
+
+// ✅ create socket.io only once
+const io = new Server(server, {
+  cors: {
+    origin: "http://localhost:5173", // frontend
+    methods: ["GET", "POST"]
+  }
+});
+
+// ✅ expose io so routes can emit
+app.set('io', io);
+
+// Middlewares
 app.use(cors());
 app.use(express.json());
 
-// ✅ Serve uploads folder
-app.use("/uploads", express.static(path.join(process.cwd(), "backend/uploads")));
+// Routes
+app.use('/api/employees', employeeRoutes);
+app.use('/api/company', companyRoutes);
+app.use('/api/attendance', attendanceRoutes);
 
-// ✅ Routes
-app.use("/api/employees", employeeRoutes);
+// ✅ Socket.io events
+io.on("connection", (socket) => {
+  console.log("Client connected:", socket.id);
 
-app.get("/", (req, res) => {
-  res.send("Backend is running...");
+  socket.on("disconnect", () => {
+    console.log("Client disconnected:", socket.id);
+  });
 });
 
 // ✅ MongoDB connect
-mongoose
-  .connect("mongodb://127.0.0.1:27017/attendpro", {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => console.log("✅ MongoDB Connected"))
-  .catch((err) => console.error("❌ MongoDB Error:", err));
+const MONGO = process.env.MONGO_URI || 'mongodb://localhost:27017/attenddb';
+mongoose.connect(MONGO)
+  .then(() => console.log('MongoDB connected'))
+  .catch(console.error);
 
-app.listen(5000, () => {
-  console.log("🚀 Server running on port 5000");
+// ✅ Run server only once
+const PORT = process.env.PORT || 5000;
+server.listen(PORT, () => {
+  console.log(`Server running on http://localhost:${PORT}`);
 });
