@@ -6,7 +6,7 @@ import AddEmployeemodel from "./components/AddEmployeeModal";
 import { AppProvider } from "./AppContext";
 import EmployeeDetails from "./pages/EmployeeDetails";
 import CompanyForm from "./pages/CompanyForm";
-import EmployeesPage from "./pages/EmployeesPage";
+import EmployeesPage from "./components/EmployeesPage";
 import Notification from "./pages/Notification"; // create this page
 
 function PrivateRoute({ children }) {

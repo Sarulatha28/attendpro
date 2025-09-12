@@ -1,50 +1,39 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import axios from "axios";
-import EmployeeCard from "../components/EmployeeCard";
-import EmployeeDetails from "../components/EmployeeDetails";
-import Sidebar from "../components/Sidebar";
+import { useNavigate } from "react-router-dom";
 
 export default function EmployeesPage() {
+  const navigate = useNavigate();
   const [employees, setEmployees] = useState([]);
-  const [selectedEmployee, setSelectedEmployee] = useState(null);
+
+  const fetchEmployees = async () => {
+    try {
+      const res = await axios.get("http://localhost:5000/api/employees");
+      setEmployees(res.data);
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   useEffect(() => {
-    const fetchEmployees = async () => {
-      try {
-        const res = await axios.get("http://localhost:5000/api/employees");
-        setEmployees(Array.isArray(res.data) ? res.data : [res.data]);
-      } catch (err) {
-        console.error("Error fetching employees:", err);
-      }
-    };
     fetchEmployees();
   }, []);
 
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
-      <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
-        {!selectedEmployee && (
-          <section>
-            <h2 className="text-lg font-semibold mb-4">All Employees</h2>
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              {employees.map((emp) => (
-                <EmployeeCard
-                  key={emp._id}
-                  employee={emp}
-                  onClick={() => setSelectedEmployee(emp)}
-                />
-              ))}
-            </div>
-          </section>
-        )}
-
-        {selectedEmployee && (
-          <EmployeeDetails
-            employee={selectedEmployee}
-            onBack={() => setSelectedEmployee(null)}
-          />
-        )}
+    <div className="p-6">
+      <h2 className="text-2xl font-bold mb-4">All Employees</h2>
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        {employees.map(emp => (
+          <div
+            key={emp._id}
+            className="bg-white p-4 rounded shadow cursor-pointer"
+            onClick={() => navigate(`/employee/${emp._id}`)}
+          >
+            <img src={emp.photo || "https://via.placeholder.com/100"} className="w-24 h-24 object-cover rounded-full mb-2" alt={emp.name} />
+            <div className="font-semibold">{emp.name}</div>
+            <div className="text-sm text-gray-500">{emp.empId}</div>
+          </div>
+        ))}
       </div>
     </div>
   );

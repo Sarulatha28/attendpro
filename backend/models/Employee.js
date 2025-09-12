@@ -1,27 +1,14 @@
-import express from "express";
-import Employee from "../models/Employee.js";
+import mongoose from "mongoose";
 
-const router = express.Router();
-
-// GET all employees
-router.get("/", async (req, res) => {
-  try {
-    const employees = await Employee.find();
-    res.json(employees);
-  } catch (err) {
-    res.status(500).json({ error: "Failed to fetch employees" });
-  }
+const employeeSchema = new mongoose.Schema({
+  name: { type: String, required: true },
+  empId: { type: String, required: true, unique: true },
+  email: { type: String, required: true },
+  password: { type: String, required: true },
+  phone: { type: String },
+  photo: { type: String },
+  createdAt: { type: Date, default: Date.now },
 });
 
-// POST add new employee
-router.post("/", async (req, res) => {
-  try {
-    const employee = new Employee(req.body);
-    await employee.save();
-    res.status(201).json(employee);
-  } catch (err) {
-    res.status(400).json({ error: err.message });
-  }
-});
-
-export default router;
+const Employee = mongoose.model("Employee", employeeSchema);
+export default Employee;
