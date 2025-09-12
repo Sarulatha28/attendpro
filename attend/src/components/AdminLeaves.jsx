@@ -1,90 +1,87 @@
-// src/pages/AdminLeaves.jsx
-import React, { useEffect, useState } from "react";
+// src/pages/ApplyLeave.jsx
+import React, { useState } from "react";
 import axios from "axios";
 
-export default function AdminLeaves() {
-  const [leaves, setLeaves] = useState([]);
+export default function ApplyLeave() {
+  const [formData, setFormData] = useState({
+    name: "",
+    employeeId: "",
+    type: "",
+    fromDate: "",
+    toDate: "",
+  });
 
-  useEffect(() => {
-    fetchLeaves();
-  }, []);
-
-  const fetchLeaves = async () => {
-    try {
-      const res = await axios.get("http://localhost:5000/api/leaves");
-      setLeaves(res.data);
-    } catch (err) {
-      console.error("Error fetching leaves", err);
-    }
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const updateStatus = async (id, status) => {
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      await axios.patch(`http://localhost:5000/api/leaves/${id}/status`, { status });
-      fetchLeaves(); // refresh after update
+      await axios.post("http://localhost:5000/api/leaves/apply", formData);
+      alert("Leave request submitted!");
     } catch (err) {
-      console.error("Error updating status", err);
+      alert("Error submitting leave request");
     }
   };
 
   return (
-    <div className="p-6">
-      <h2 className="text-xl font-bold mb-4">Leave Requests</h2>
-      <table className="w-full border">
-        <thead>
-          <tr className="bg-gray-200">
-            <th className="p-2">Name</th>
-            <th className="p-2">Type</th>
-            <th className="p-2">Dates</th>
-            <th className="p-2">Reason</th>
-            <th className="p-2">Status</th>
-            <th className="p-2">Action</th>
-          </tr>
-        </thead>
-        <tbody>
-          {leaves.map((leave) => (
-            <tr key={leave._id} className="border text-center">
-              <td className="p-2">{leave.name}</td>
-              <td className="p-2">{leave.type}</td>
-              <td className="p-2">
-                {leave.fromDate} → {leave.toDate}
-              </td>
-              <td className="p-2">{leave.reason}</td>
-              <td className="p-2">
-                <span
-                  className={`px-2 py-1 rounded text-white ${
-                    leave.status === "Accepted"
-                      ? "bg-green-500"
-                      : leave.status === "Rejected"
-                      ? "bg-red-500"
-                      : "bg-yellow-500"
-                  }`}
-                >
-                  {leave.status || "Pending"}
-                </span>
-              </td>
-              <td className="p-2">
-                {leave.status === "Pending" && (
-                  <div className="flex gap-2 justify-center">
-                    <button
-                      onClick={() => updateStatus(leave._id, "Accepted")}
-                      className="bg-green-500 text-white px-3 py-1 rounded"
-                    >
-                      Accept
-                    </button>
-                    <button
-                      onClick={() => updateStatus(leave._id, "Rejected")}
-                      className="bg-red-500 text-white px-3 py-1 rounded"
-                    >
-                      Reject
-                    </button>
-                  </div>
-                )}
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+    <div>
+      <h2 className="text-2xl font-bold mb-4">Apply for Leave</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <input
+          type="text"
+          name="name"
+          placeholder="Your Name"
+          value={formData.name}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
+        />
+        <input
+          type="text"
+          name="employeeId"
+          placeholder="Employee ID"
+          value={formData.employeeId}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
+        />
+        <select
+          name="type"
+          value={formData.type}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
+        >
+          <option value="">Select Leave Type</option>
+          <option value="sick">Sick Leave</option>
+          <option value="casual">Casual Leave</option>
+          <option value="vacation">Vacation</option>
+        </select>
+        <input
+          type="date"
+          name="fromDate"
+          value={formData.fromDate}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
+        />
+        <input
+          type="date"
+          name="toDate"
+          value={formData.toDate}
+          onChange={handleChange}
+          className="border p-2 w-full"
+          required
+        />
+        <button
+          type="submit"
+          className="bg-blue-600 text-white px-4 py-2 rounded"
+        >
+          Submit
+        </button>
+      </form>
     </div>
   );
 }

@@ -36,7 +36,7 @@ export default function ApplyLeave() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 flex flex-col items-center">
+    <div className="w-full">
       {/* Banner */}
       <div className="w-full h-44 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
         <h1 className="text-3xl md:text-4xl font-extrabold text-white drop-shadow-lg">
@@ -47,7 +47,7 @@ export default function ApplyLeave() {
       {/* Form Section */}
       <form
         onSubmit={handleSubmit}
-        className="w-full max-w-4xl bg-white/90 backdrop-blur-md p-10 rounded-2xl shadow-xl border border-gray-200 mt-10 space-y-6"
+        className="w-full max-w-4xl mx-auto bg-white/90 backdrop-blur-md p-10 rounded-2xl shadow-xl border border-gray-200 mt-10 space-y-6"
       >
         {/* Employee Info */}
         <div className="grid md:grid-cols-2 gap-6">

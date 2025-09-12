@@ -1,35 +1,56 @@
 import express from "express";
 import Employee from "../models/Employee.js";
+import multer from "multer";
+import bcrypt from "bcryptjs";
 
 const router = express.Router();
 
-// Add Employee
-router.post("/", async (req, res) => {
-  try {
-    const employee = await Employee.create(req.body);
-    res.status(201).json(employee);
-  } catch (err) {
-    res.status(500).json({ message: "Error adding employee", error: err.message });
-  }
+// Multer config
+const storage = multer.diskStorage({
+  destination: (req, file, cb) => cb(null, "uploads/"),
+  filename: (req, file, cb) => cb(null, Date.now() + "-" + file.originalname)
 });
+const upload = multer({ storage });
 
-// Get all employees
-router.get("/", async (req, res) => {
+// POST /api/employees
+router.post("/", upload.single("photo"), async (req, res) => {
   try {
-    const employees = await Employee.find().sort({ createdAt: -1 });
-    res.json(employees);
-  } catch (err) {
-    res.status(500).json({ message: "Error fetching employees", error: err.message });
-  }
-});
+    let { name, employeeId, email, password, companyId, phone } = req.body;
 
-// Get employee by id
-router.get("/:id", async (req, res) => {
-  try {
-    const employee = await Employee.findById(req.params.id);
-    res.json(employee);
+    // Validate required fields
+    if (!name || !email || !password || !companyId || !phone) {
+      return res.status(400).json({ message: "All fields except photo are required" });
+    }
+
+    // Auto-generate employeeId if empty
+    if (!employeeId) {
+      employeeId = "EMP-" + Date.now();
+    }
+
+    // Check for duplicate employeeId
+    const exists = await Employee.findOne({ employeeId });
+    if (exists) {
+      return res.status(400).json({ message: "Employee ID already exists" });
+    }
+
+    // Hash password
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    const newEmployee = new Employee({
+      name,
+      employeeId,
+      email,
+      password: hashedPassword,
+      companyId,
+      phone,
+      photo: req.file ? req.file.path : null
+    });
+
+    await newEmployee.save();
+    res.status(201).json({ message: "Employee added successfully" });
   } catch (err) {
-    res.status(500).json({ message: "Error fetching employee", error: err.message });
+    console.error(err);
+    res.status(500).json({ message: "Failed to add employee", error: err.message });
   }
 });
 

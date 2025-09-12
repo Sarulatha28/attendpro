@@ -1,94 +1,116 @@
-// src/components/Dashboard.jsx
-import React, { useEffect, useState } from "react";
-import { FiPlus } from "react-icons/fi";
-import { useNavigate } from "react-router-dom";
+import React, { useState } from "react";
 import axios from "axios";
-import Sidebar from "./Sidebar";
-import AttendanceChecker from "./AttendanceChecker";
 
-export default function Dashboard() {
-  const navigate = useNavigate();
-  const [summary, setSummary] = useState({ total: 0, present: 0, absent: 0 });
-  const [employees, setEmployees] = useState([]);
+export default function AddEmployeeModal({ onClose, onAdded }) {
+  const [form, setForm] = useState({
+    name: "",
+    employeeId: "",
+    email: "",
+    password: "",
+    companyId: "",
+    phone: "",
+  });
+  const [message, setMessage] = useState("");
 
-  // Fetch employees and summary
-  const fetchSummary = async () => {
+  const handleChange = (e) => {
+    setForm({ ...form, [e.target.name]: e.target.value });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
     try {
-      // Total employees list
-      const res = await axios.get("http://localhost:5000/api/employees");
-      setEmployees(res.data);
-      setSummary({
-        total: res.data.length,
-        present: res.data.filter(emp => emp.status === "present").length,
-        absent: res.data.filter(emp => emp.status !== "present").length,
+      await axios.post("http://localhost:5000/api/employees", form);
+      setMessage("Employee added successfully ✅");
+      setForm({
+        name: "",
+        employeeId: "",
+        email: "",
+        password: "",
+        companyId: "",
+        phone: "",
       });
+
+      if (onAdded) onAdded(); // callback to parent to refresh list
+      setTimeout(() => {
+        setMessage("");
+        if (onClose) onClose(); // close modal after success
+      }, 1500);
     } catch (err) {
-      console.error("Error fetching summary:", err);
+      console.error("Failed to add employee:", err);
+      setMessage("Failed to add employee ❌");
     }
   };
 
-  useEffect(() => {
-    fetchSummary();
-    const interval = setInterval(fetchSummary, 5000); // refresh every 5s
-    return () => clearInterval(interval);
-  }, []);
-
   return (
-    <div className="flex min-h-screen">
-      <Sidebar />
+    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
+      <div className="bg-white w-full max-w-md p-6 rounded shadow relative">
+        <button
+          onClick={onClose}
+          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-lg font-bold"
+        >
+          ✕
+        </button>
 
-      <div className="flex-1 p-6 bg-gray-100 overflow-y-auto">
-        {/* Header */}
-        <header className="flex justify-between items-center mb-6">
-          <h1 className="text-2xl md:text-3xl font-semibold">Dashboard</h1>
-          <div className="flex items-center gap-4">
-            <button
-              onClick={() => navigate("/add-employee")}
-              className="p-3 bg-blue-600 text-white rounded-full shadow hover:bg-blue-700"
-            >
-              <FiPlus size={20} />
-            </button>
-            <button
-              className="px-3 py-2 bg-green-600 text-white rounded"
-              onClick={() => navigate("/company-form")}
-            >
-              Set Company Geo
-            </button>
-          </div>
-        </header>
+        <h2 className="text-xl font-bold mb-4">Add Employee</h2>
+        {message && <p className="mb-3 text-green-600">{message}</p>}
 
-        {/* Stats */}
-        <section className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-          <div
-            className="bg-white p-4 rounded shadow cursor-pointer hover:bg-gray-50"
-            onClick={() => navigate("/employees")}
+        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+          <input
+            name="name"
+            placeholder="Name"
+            value={form.name}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded"
+          />
+          <input
+            name="employeeId"
+            placeholder="Employee ID (optional)"
+            value={form.employeeId}
+            onChange={handleChange}
+            className="border p-2 rounded"
+          />
+          <input
+            name="email"
+            type="email"
+            placeholder="Email"
+            value={form.email}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded"
+          />
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            value={form.password}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded"
+          />
+          <input
+            name="companyId"
+            placeholder="Company ID"
+            value={form.companyId}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded"
+          />
+          <input
+            name="phone"
+            placeholder="Phone"
+            value={form.phone}
+            onChange={handleChange}
+            required
+            className="border p-2 rounded"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white py-2 px-4 rounded mt-2"
           >
-            <div className="text-sm">Total Employees</div>
-            <div className="text-xl font-bold">{summary.total}</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm">Present</div>
-            <div className="text-xl font-bold">{summary.present}</div>
-          </div>
-          <div className="bg-white p-4 rounded shadow">
-            <div className="text-sm">Absent</div>
-            <div className="text-xl font-bold">{summary.absent}</div>
-          </div>
-        </section>
-
-        {/* Attendance Summary & Checker */}
-        <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6 mt-6">
-          <div className="lg:col-span-2 bg-white p-4 rounded shadow">
-            <h2 className="font-semibold mb-3">Attendance Summary</h2>
-            <div className="h-64 flex items-center justify-center text-gray-400">
-              [ Chart Placeholder ]
-            </div>
-          </div>
-        </section>
-
-        <section className="mt-6">
-          <AttendanceChecker />
-        </section>
+            Add Employee
+          </button>
+        </form>
       </div>
     </div>
   );

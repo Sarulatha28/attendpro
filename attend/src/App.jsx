@@ -97,39 +97,20 @@ export default function App() {
             }
           />
 
-          {/* Protected Employee Routes */}
+          {/* Protected Employee Routes with Sticky Layout */}
           <Route
-            path="/employee-dashboard"
+            path="/"
             element={
               <PrivateRoute>
-                <EmployeeDashboard />
+                <Layouts />
               </PrivateRoute>
             }
-          />
-          <Route
-            path="/attendance"
-            element={
-              <PrivateRoute>
-                <Attendance />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/leave-requests"
-            element={
-              <PrivateRoute>
-                <ApplyLeave />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/profile"
-            element={
-              <PrivateRoute>
-                <Profile />
-              </PrivateRoute>
-            }
-          />
+          >
+            <Route path="employee-dashboard" element={<EmployeeDashboard />} />
+            <Route path="attendance" element={<Attendance />} />
+            <Route path="leave-requests" element={<ApplyLeave />} />
+            <Route path="profile" element={<Profile />} />
+          </Route>
 
           {/* Catch-all: Redirect unknown paths */}
           <Route path="*" element={<Navigate to="/" replace />} />

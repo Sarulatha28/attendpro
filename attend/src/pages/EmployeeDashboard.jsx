@@ -1,6 +1,5 @@
 // src/pages/EmployeeDashboard.jsx
-import React, { useEffect, useState } from "react";
-import axios from "axios";
+import React from "react";
 import {
   BarChart,
   Bar,
@@ -31,41 +30,14 @@ const leaveData = [
 
 const COLORS = ["#FF8042", "#0088FE", "#00C49F"];
 
-const EmployeeDashboard = ({ employeeId }) => {
-  const [attendanceMessage, setAttendanceMessage] = useState("");
-
-  useEffect(() => {
-    if (!employeeId) return;
-
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        async (position) => {
-          const { latitude, longitude } = position.coords;
-
-          try {
-            const res = await axios.post(
-              "http://localhost:5000/api/attendance/mark",
-              { employeeId, latitude, longitude }
-            );
-            setAttendanceMessage(res.data.message);
-          } catch (err) {
-            setAttendanceMessage(err.response?.data?.message || "Error marking attendance");
-          }
-        },
-        () => {
-          setAttendanceMessage("Location access denied or unavailable");
-        }
-      );
-    } else {
-      setAttendanceMessage("Geolocation not supported");
-    }
-  }, [employeeId]);
-
+const EmployeeDashboard = () => {
   return (
-    <div>
+    <div className="p-6">
       {/* Topbar */}
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold text-gray-800">Employee Dashboard</h1>
+        <h1 className="text-2xl font-bold text-gray-800">
+          Employee Dashboard
+        </h1>
         <div className="flex items-center space-x-3">
           <span className="text-gray-700">Pooja (Employee)</span>
           <img
@@ -76,14 +48,7 @@ const EmployeeDashboard = ({ employeeId }) => {
         </div>
       </div>
 
-      {/* Attendance Message */}
-      {attendanceMessage && (
-        <div className="mb-4 p-3 bg-green-100 text-green-800 rounded">
-          {attendanceMessage}
-        </div>
-      )}
-
-      {/* Stats Cards */}
+      {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-6">
         {[
           { label: "Attendance Days", value: 82, color: "text-green-600" },
@@ -91,7 +56,10 @@ const EmployeeDashboard = ({ employeeId }) => {
           { label: "Documents Submitted", value: 12, color: "text-blue-600" },
           { label: "Upcoming Holidays", value: 3, color: "text-yellow-600" },
         ].map((stat, idx) => (
-          <div key={idx} className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition">
+          <div
+            key={idx}
+            className="bg-white p-4 rounded-xl shadow-md hover:shadow-lg transition"
+          >
             <h2 className="text-gray-500">{stat.label}</h2>
             <p className={`text-2xl font-bold ${stat.color}`}>{stat.value}</p>
           </div>
@@ -100,6 +68,7 @@ const EmployeeDashboard = ({ employeeId }) => {
 
       {/* Charts */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+        {/* Line Chart */}
         <div className="bg-white p-4 rounded-xl shadow-md">
           <h2 className="text-lg font-semibold mb-4">Attendance Trends</h2>
           <ResponsiveContainer width="100%" height={250}>
@@ -113,13 +82,23 @@ const EmployeeDashboard = ({ employeeId }) => {
           </ResponsiveContainer>
         </div>
 
+        {/* Pie Chart */}
         <div className="bg-white p-4 rounded-xl shadow-md">
           <h2 className="text-lg font-semibold mb-4">Leave Distribution</h2>
           <ResponsiveContainer width="100%" height={250}>
             <PieChart>
-              <Pie data={leaveData} dataKey="value" nameKey="name" outerRadius={100} label>
+              <Pie
+                data={leaveData}
+                dataKey="value"
+                nameKey="name"
+                outerRadius={100}
+                label
+              >
                 {leaveData.map((entry, index) => (
-                  <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={COLORS[index % COLORS.length]}
+                  />
                 ))}
               </Pie>
               <Tooltip />
@@ -130,7 +109,9 @@ const EmployeeDashboard = ({ employeeId }) => {
 
       {/* Bar Chart */}
       <div className="bg-white p-4 rounded-xl shadow-md mb-6">
-        <h2 className="text-lg font-semibold mb-4">Monthly Attendance Summary</h2>
+        <h2 className="text-lg font-semibold mb-4">
+          Monthly Attendance Summary
+        </h2>
         <ResponsiveContainer width="100%" height={250}>
           <BarChart data={attendanceData}>
             <XAxis dataKey="month" />
@@ -140,6 +121,48 @@ const EmployeeDashboard = ({ employeeId }) => {
             <Bar dataKey="absent" fill="#F44336" />
           </BarChart>
         </ResponsiveContainer>
+      </div>
+
+      {/* Attendance List */}
+      <div className="bg-white p-4 rounded-xl shadow-md">
+        <h2 className="text-lg font-semibold mb-4">Recent Attendance</h2>
+        <table className="w-full border-collapse">
+          <thead>
+            <tr className="bg-gray-100 text-left">
+              <th className="p-2">Date</th>
+              <th className="p-2">Status</th>
+              <th className="p-2">Work Hours</th>
+            </tr>
+          </thead>
+          <tbody>
+            {[
+              {
+                date: "2025-09-01",
+                status: "Present",
+                color: "text-green-600",
+                hours: "8h",
+              },
+              {
+                date: "2025-09-02",
+                status: "Absent",
+                color: "text-red-600",
+                hours: "0h",
+              },
+              {
+                date: "2025-09-03",
+                status: "Present",
+                color: "text-green-600",
+                hours: "7h 30m",
+              },
+            ].map((row, idx) => (
+              <tr key={idx} className="border-b hover:bg-gray-50 transition">
+                <td className="p-2">{row.date}</td>
+                <td className={`p-2 ${row.color}`}>{row.status}</td>
+                <td className="p-2">{row.hours}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );

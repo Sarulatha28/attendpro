@@ -1,5 +1,7 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { Link } from "react-router-dom";
+import { motion } from "framer-motion";
 
 export default function AdminSignUp() {
   const [form, setForm] = useState({
@@ -23,57 +25,77 @@ export default function AdminSignUp() {
   };
 
   return (
-    <div className="flex items-center justify-center h-screen bg-gray-100">
-      <form
+    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100">
+      <motion.form
         onSubmit={handleSubmit}
-        className="bg-white p-6 rounded-lg shadow-lg w-96"
+        className="bg-white p-8 rounded-2xl shadow-xl w-96 flex flex-col"
+        initial={{ scale: 0.9, opacity: 0 }}
+        animate={{ scale: 1, opacity: 1 }}
+        transition={{ duration: 0.5 }}
       >
-        <h2 className="text-2xl font-bold mb-4 text-center">Admin Sign Up</h2>
+        <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">Admin Sign Up</h2>
 
         {/* Company Name */}
-        <input
+        <motion.input
+          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
           type="text"
           name="companyName"
           placeholder="Company Name"
           onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
           required
         />
 
         {/* Company ID */}
-        <input
+        <motion.input
+          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
           type="text"
           name="cmpId"
           placeholder="Company ID"
           onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
           required
         />
 
         {/* Email */}
-        <input
+        <motion.input
+          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
           type="email"
           name="email"
           placeholder="Email"
           onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
           required
         />
 
         {/* Password */}
-        <input
+        <motion.input
+          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
           type="password"
           name="password"
           placeholder="Password"
           onChange={handleChange}
-          className="w-full mb-3 p-2 border rounded"
+          className="w-full mb-6 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
           required
         />
 
-        <button className="w-full bg-green-600 text-white py-2 rounded hover:bg-green-700">
+        {/* Sign Up Button */}
+        <motion.button
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+          className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all"
+        >
           Sign Up
-        </button>
-      </form>
+        </motion.button>
+
+        {/* Already have an account */}
+        <p className="mt-4 text-center text-gray-600">
+          Already have an account?{" "}
+          <Link to="/adminsignin" className="text-indigo-600 font-medium hover:underline">
+            Sign In
+          </Link>
+        </p>
+      </motion.form>
     </div>
   );
 }
