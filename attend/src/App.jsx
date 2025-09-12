@@ -1,17 +1,30 @@
+// src/App.jsx
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import Signin from "./pages/Signin";
-import Dashboard from "./components/Dashboard";
-import Log from "./pages/Log";
-import AddEmployeemodel from "./components/AddEmployeeModal";
 import { AppProvider } from "./AppContext";
-import EmployeeDetails from "./pages/EmployeeDetails";
-import CompanyForm from "./pages/CompanyForm";
-import EmployeesPage from "./components/EmployeesPage";
-import Notification from "./pages/Notification"; // create this page
 
+// Components & Pages
+import AddEmployeemodel from "./components/AddEmployeeModal";
+import ApplyLeave from "./components/ApplyLeave";
+import Dashboard from "./components/Dashboard";
+import EmployeesPage from "./components/EmployeesPage";
+import Layouts from "./components/Layouts";
+import Attendance from "./pages/Attendance";
+import CompanyForm from "./pages/CompanyForm";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import Log from "./pages/Log";
+import EmployeeDetails from "./pages/EmployeeDetails";
+import Notification from "./pages/Notification";
+import Profile from "./pages/Profile";
+import WelcomePage from "./components/WelcomePage";
+import AdminSignUp from "./components/AdminSignUp";
+import AdminSignIn from "./components/AdminSignIn";
+import EmployeeSignIn from "./pages/EmployeeSignIn";
+import AdminPage from "./components/AdminPage";
+
+// Private Route Wrapper
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
-  return token ? children : <Navigate to="/signin" replace />;
+  return token ? children : <Navigate to="/" replace />;
 }
 
 export default function App() {
@@ -19,9 +32,14 @@ export default function App() {
     <AppProvider>
       <BrowserRouter>
         <Routes>
-          <Route path="/signin" element={<Signin />} />
+          {/* Public Routes */}
+          <Route path="/" element={<WelcomePage />} />
+          <Route path="/admin" element={<AdminPage />} />
+          <Route path="/adminsignup" element={<AdminSignUp />} />
+          <Route path="/adminsignin" element={<AdminSignIn />} />
+          <Route path="/employeesignin" element={<EmployeeSignIn />} />
 
-          {/* Protected routes */}
+          {/* Protected Admin Routes */}
           <Route
             path="/dashboard"
             element={
@@ -35,14 +53,6 @@ export default function App() {
             element={
               <PrivateRoute>
                 <EmployeesPage />
-              </PrivateRoute>
-            }
-          />
-          <Route
-            path="/notification"
-            element={
-              <PrivateRoute>
-                <Notification />
               </PrivateRoute>
             }
           />
@@ -71,6 +81,14 @@ export default function App() {
             }
           />
           <Route
+            path="/notification"
+            element={
+              <PrivateRoute>
+                <Notification />
+              </PrivateRoute>
+            }
+          />
+          <Route
             path="/log"
             element={
               <PrivateRoute>
@@ -79,8 +97,42 @@ export default function App() {
             }
           />
 
-          {/* Default redirect */}
-          <Route path="*" element={<Navigate to="/dashboard" replace />} />
+          {/* Protected Employee Routes */}
+          <Route
+            path="/employee-dashboard"
+            element={
+              <PrivateRoute>
+                <EmployeeDashboard />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/attendance"
+            element={
+              <PrivateRoute>
+                <Attendance />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/leave-requests"
+            element={
+              <PrivateRoute>
+                <ApplyLeave />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/profile"
+            element={
+              <PrivateRoute>
+                <Profile />
+              </PrivateRoute>
+            }
+          />
+
+          {/* Catch-all: Redirect unknown paths */}
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
       </BrowserRouter>
     </AppProvider>
