@@ -1,23 +1,27 @@
-export default function EmployeeDetails({ employee, onClose }) {
-  return (
-    <div className="fixed inset-0 bg-black/40 flex items-center justify-center z-50 p-4">
-      <div className="bg-white p-6 rounded w-full max-w-2xl">
-        <div className="flex justify-between items-center mb-4">
-          <h2 className="text-lg font-semibold">Employee Details</h2>
-          <button onClick={onClose} className="text-gray-600">Close</button>
-        </div>
+import React from "react";
 
-        <div className="flex flex-col md:flex-row gap-6">
-          <img src={employee.photoUrl || "/default-avatar.png"} alt="profile" className="w-48 h-48 object-cover rounded" />
-          <div>
-            <div><strong>Name:</strong> {employee.name}</div>
-            <div><strong>Employee ID:</strong> {employee.employeeId}</div>
-            <div><strong>Email:</strong> {employee.email}</div>
-            <div><strong>Age:</strong> {employee.age}</div>
-            <div><strong>Education:</strong> {employee.education}</div>
-            <div><strong>Experience:</strong> {employee.experience}</div>
-            <div><strong>Company ID:</strong> {employee.companyId}</div>
-          </div>
+export default function EmployeeDetails({ employee, onBack }) {
+  if (!employee) return null;
+
+  return (
+    <div className="bg-white p-6 rounded shadow">
+      <button
+        onClick={onBack}
+        className="mb-4 px-3 py-2 bg-gray-600 text-white rounded"
+      >
+        Back
+      </button>
+      <div className="flex items-center gap-6">
+        <img
+          src={employee.photo || "https://via.placeholder.com/150"}
+          alt={employee.name}
+          className="w-32 h-32 object-cover rounded-full"
+        />
+        <div>
+          <h2 className="text-2xl font-bold">{employee.name}</h2>
+          <p className="text-gray-600">Employee ID: {employee.employeeId}</p>
+          <p className="text-gray-600">Email: {employee.email}</p>
+          <p className="text-gray-600">Phone: {employee.phone}</p>
         </div>
       </div>
     </div>

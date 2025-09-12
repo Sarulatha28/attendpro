@@ -1,12 +1,13 @@
-// src/App.jsx
-import React from "react";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import Signin from "./pages/Signin";
 import Dashboard from "./components/Dashboard";
-import Employee from "./pages/EmployeeCard";
 import Log from "./pages/Log";
-import AddEmployeemodel from "./components/AddEmployeeModal"; // ✅ create this page wrapper
+import AddEmployeemodel from "./components/AddEmployeeModal";
 import { AppProvider } from "./AppContext";
+import EmployeeDetails from "./pages/EmployeeDetails";
+import CompanyForm from "./pages/CompanyForm";
+import EmployeesPage from "./pages/EmployeesPage";
+import Notification from "./pages/Notification"; // create this page
 
 function PrivateRoute({ children }) {
   const token = localStorage.getItem("token");
@@ -30,10 +31,42 @@ export default function App() {
             }
           />
           <Route
-            path="/employee"
+            path="/employees"
             element={
               <PrivateRoute>
-                <Employee />
+                <EmployeesPage />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/notification"
+            element={
+              <PrivateRoute>
+                <Notification />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/add-employee"
+            element={
+              <PrivateRoute>
+                <AddEmployeemodel />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/company-form"
+            element={
+              <PrivateRoute>
+                <CompanyForm />
+              </PrivateRoute>
+            }
+          />
+          <Route
+            path="/employee/:id"
+            element={
+              <PrivateRoute>
+                <EmployeeDetails />
               </PrivateRoute>
             }
           />
@@ -42,16 +75,6 @@ export default function App() {
             element={
               <PrivateRoute>
                 <Log />
-              </PrivateRoute>
-            }
-          />
-
-          {/* ➕ Add Employee page route */}
-          <Route
-            path="/add-employee"
-            element={
-              <PrivateRoute>
-                <AddEmployee />
               </PrivateRoute>
             }
           />

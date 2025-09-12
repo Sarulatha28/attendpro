@@ -1,10 +1,10 @@
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 
 const companySchema = new mongoose.Schema({
-  name: String,
-  lat: Number,
-  lng: Number,
-  radius: Number, // meters
+  name: { type: String, required: true },
+  latitude: { type: Number, required: true },
+  longitude: { type: Number, required: true },
+  radius: { type: Number, required: true },
 });
 
-export default mongoose.model('Company', companySchema);
+export default mongoose.model("Company", companySchema);
