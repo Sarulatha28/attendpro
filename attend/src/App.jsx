@@ -97,19 +97,20 @@ export default function App() {
             }
           />
 
-          {/* Protected Employee Routes with Sticky Layout */}
+          {/* Protected Employee Routes with Layout - FIXED PATH */}
           <Route
-            path="/"
+            path="/employee/*"
             element={
               <PrivateRoute>
                 <Layouts />
               </PrivateRoute>
             }
           >
-            <Route path="employee-dashboard" element={<EmployeeDashboard />} />
+            <Route path="dashboard" element={<EmployeeDashboard />} />
             <Route path="attendance" element={<Attendance />} />
             <Route path="leave-requests" element={<ApplyLeave />} />
             <Route path="profile" element={<Profile />} />
+            <Route path="" element={<Navigate to="dashboard" replace />} />
           </Route>
 
           {/* Catch-all: Redirect unknown paths */}

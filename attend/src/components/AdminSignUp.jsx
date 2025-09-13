@@ -1,101 +1,65 @@
 import React, { useState } from "react";
 import axios from "axios";
-import { Link } from "react-router-dom";
-import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
 
 export default function AdminSignUp() {
-  const [form, setForm] = useState({
-    companyName: "",
-    cmpId: "",
+  const navigate = useNavigate();
+  const [formData, setFormData] = useState({
+    name: "",
     email: "",
-    password: ""
+    password: "",
   });
 
-  const handleChange = (e) =>
-    setForm({ ...form, [e.target.name]: e.target.value });
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      const res = await axios.post("http://localhost:5000/api/admin/signup", form);
+      const res = await axios.post("http://localhost:5000/api/admin/signup", formData);
       alert(res.data.message);
+      navigate("/adminsignin");
     } catch (err) {
-      alert(err.response?.data?.message || "Error");
+      alert(err.response.data.message);
     }
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-100 via-purple-100 to-pink-100">
-      <motion.form
-        onSubmit={handleSubmit}
-        className="bg-white p-8 rounded-2xl shadow-xl w-96 flex flex-col"
-        initial={{ scale: 0.9, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-3xl font-bold mb-6 text-center text-indigo-700">Admin Sign Up</h2>
-
-        {/* Company Name */}
-        <motion.input
-          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
+    <div className="flex flex-col items-center justify-center h-screen bg-gray-900 text-white">
+      <h1 className="text-3xl font-bold mb-6">Admin Sign Up</h1>
+      <form onSubmit={handleSubmit} className="flex flex-col space-y-4 w-80">
+        <input
           type="text"
-          name="companyName"
-          placeholder="Company Name"
+          name="name"
+          placeholder="Name"
+          value={formData.name}
           onChange={handleChange}
-          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+          className="px-4 py-2 rounded-lg text-black"
           required
         />
-
-        {/* Company ID */}
-        <motion.input
-          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
-          type="text"
-          name="cmpId"
-          placeholder="Company ID"
-          onChange={handleChange}
-          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
-          required
-        />
-
-        {/* Email */}
-        <motion.input
-          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
+        <input
           type="email"
           name="email"
           placeholder="Email"
+          value={formData.email}
           onChange={handleChange}
-          className="w-full mb-4 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+          className="px-4 py-2 rounded-lg text-black"
           required
         />
-
-        {/* Password */}
-        <motion.input
-          whileFocus={{ scale: 1.02, borderColor: "#6366F1" }}
+        <input
           type="password"
           name="password"
           placeholder="Password"
+          value={formData.password}
           onChange={handleChange}
-          className="w-full mb-6 p-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-300 transition-all"
+          className="px-4 py-2 rounded-lg text-black"
           required
         />
-
-        {/* Sign Up Button */}
-        <motion.button
-          whileHover={{ scale: 1.05 }}
-          whileTap={{ scale: 0.95 }}
-          className="w-full bg-indigo-600 text-white py-3 rounded-lg font-semibold hover:bg-indigo-700 transition-all"
-        >
+        <button type="submit" className="bg-green-600 hover:bg-green-800 px-4 py-2 rounded-lg font-semibold">
           Sign Up
-        </motion.button>
-
-        {/* Already have an account */}
-        <p className="mt-4 text-center text-gray-600">
-          Already have an account?{" "}
-          <Link to="/adminsignin" className="text-indigo-600 font-medium hover:underline">
-            Sign In
-          </Link>
-        </p>
-      </motion.form>
+        </button>
+      </form>
     </div>
   );
 }

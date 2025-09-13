@@ -1,117 +1,105 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { Users, UserCheck, UserX, Activity, MapPin, Plus } from "lucide-react";
+import Sidebar from "./Sidebar";
+import AddEmployeeModal from "./AddEmployeeModal";
+import { useNavigate } from "react-router-dom";
 import axios from "axios";
 
-export default function AddEmployeeModal({ onClose, onAdded }) {
-  const [form, setForm] = useState({
-    name: "",
-    employeeId: "",
-    email: "",
-    password: "",
-    companyId: "",
-    phone: "",
-  });
-  const [message, setMessage] = useState("");
-
-  const handleChange = (e) => {
-    setForm({ ...form, [e.target.name]: e.target.value });
+export default function Dashboard() {
+  const [showModal, setShowModal] = useState(false);
+  const [employees, setEmployees] = useState([]);
+  const navigate = useNavigate();
+  const handleSetLocation = () => {
+    navigate("/company-form"); // navigate to your route
   };
+  // Fetch employees from backend
+  useEffect(() => {
+    const fetchEmployees = async () => {
+      try {
+        const res = await axios.get("http://localhost:5000/api/employees");
+        setEmployees(res.data);
+      } catch (err) {
+        console.error("Error fetching employees:", err);
+      }
+    };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    try {
-      await axios.post("http://localhost:5000/api/employees", form);
-      setMessage("Employee added successfully ✅");
-      setForm({
-        name: "",
-        employeeId: "",
-        email: "",
-        password: "",
-        companyId: "",
-        phone: "",
-      });
+    fetchEmployees();
+  }, []);
 
-      if (onAdded) onAdded(); // callback to parent to refresh list
-      setTimeout(() => {
-        setMessage("");
-        if (onClose) onClose(); // close modal after success
-      }, 1500);
-    } catch (err) {
-      console.error("Failed to add employee:", err);
-      setMessage("Failed to add employee ❌");
-    }
-  };
+  // Counts
+  const totalEmployees = employees.length;
+  const presentCount = employees.filter((emp) => emp.status === "present").length;
+  const absentCount = employees.filter((emp) => emp.status === "absent").length;
+  const liveCount = presentCount; // you can define differently if needed
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-40 flex justify-center items-center z-50">
-      <div className="bg-white w-full max-w-md p-6 rounded shadow relative">
-        <button
-          onClick={onClose}
-          className="absolute top-2 right-2 text-gray-500 hover:text-gray-800 text-lg font-bold"
-        >
-          ✕
-        </button>
+    <div className="flex min-h-screen bg-gray-100">
+      <Sidebar />
 
-        <h2 className="text-xl font-bold mb-4">Add Employee</h2>
-        {message && <p className="mb-3 text-green-600">{message}</p>}
-
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            name="name"
-            placeholder="Name"
-            value={form.name}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="employeeId"
-            placeholder="Employee ID (optional)"
-            value={form.employeeId}
-            onChange={handleChange}
-            className="border p-2 rounded"
-          />
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            value={form.email}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            value={form.password}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="companyId"
-            placeholder="Company ID"
-            value={form.companyId}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
-          <input
-            name="phone"
-            placeholder="Phone"
-            value={form.phone}
-            onChange={handleChange}
-            required
-            className="border p-2 rounded"
-          />
+      <main className="flex-1 p-6 relative">
+        {/* Top Right Buttons */}
+        <div className="absolute top-6 right-6 flex gap-4">
+            <button
+      onClick={handleSetLocation}
+      className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-xl shadow"
+    >
+      <MapPin className="w-5 h-5" />
+      Set Location
+    </button>
           <button
-            type="submit"
-            className="bg-blue-600 text-white py-2 px-4 rounded mt-2"
+            onClick={() => setShowModal(true)}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-xl shadow"
           >
+            <Plus className="w-5 h-5" />
             Add Employee
           </button>
-        </form>
-      </div>
+        </div>
+
+        {/* Cards */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mt-20">
+          {/* Total Employees */}
+          <div
+            onClick={() => navigate("/employees")}
+            className="bg-white p-6 rounded-2xl shadow flex items-center space-x-4 cursor-pointer hover:shadow-lg"
+          >
+            <Users className="w-10 h-10 text-blue-600" />
+            <div>
+              <p className="text-gray-500">Total Employees</p>
+              <h2 className="text-2xl font-bold">{totalEmployees}</h2>
+            </div>
+          </div>
+
+          {/* Present */}
+          <div className="bg-white p-6 rounded-2xl shadow flex items-center space-x-4">
+            <UserCheck className="w-10 h-10 text-green-600" />
+            <div>
+              <p className="text-gray-500">Present</p>
+              <h2 className="text-2xl font-bold">{presentCount}</h2>
+            </div>
+          </div>
+
+          {/* Absent */}
+          <div className="bg-white p-6 rounded-2xl shadow flex items-center space-x-4">
+            <UserX className="w-10 h-10 text-red-600" />
+            <div>
+              <p className="text-gray-500">Absent</p>
+              <h2 className="text-2xl font-bold">{absentCount}</h2>
+            </div>
+          </div>
+
+          {/* Live Count */}
+          <div className="bg-white p-6 rounded-2xl shadow flex items-center space-x-4">
+            <Activity className="w-10 h-10 text-purple-600" />
+            <div>
+              <p className="text-gray-500">Live Count</p>
+              <h2 className="text-2xl font-bold">{liveCount}</h2>
+            </div>
+          </div>
+        </div>
+
+        {/* Modal */}
+        {showModal && <AddEmployeeModal onClose={() => setShowModal(false)} />}
+      </main>
     </div>
   );
 }

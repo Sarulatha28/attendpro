@@ -4,10 +4,14 @@ const employeeSchema = new mongoose.Schema({
   name: { type: String, required: true },
   employeeId: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
-  password: { type: String, required: true },
-  companyId: { type: String, required: true },
   phone: { type: String, required: true },
-  photo: { type: String } // store file path
-}, { timestamps: true });
+  password: { type: String, required: true },
+  photo: { type: String }, // optional photo URL
+  status: { type: String, enum: ["present", "absent"], default: "absent" },
+});
 
-export default mongoose.model("Employee", employeeSchema);
+// ✅ Fix overwrite error
+const Employee =
+  mongoose.models.Employee || mongoose.model("Employee", employeeSchema);
+
+export default Employee;

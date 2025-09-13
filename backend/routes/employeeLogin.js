@@ -1,25 +1,27 @@
 import express from "express";
-import bcrypt from "bcryptjs";
-import jwt from "jsonwebtoken";
-import EmployeeDetails from "../models/EmployeeDetails.js";
+import Employee from "../models/Employee.js";  // ✅ fixed case
 
 const router = express.Router();
 
-// Employee Sign In
+// Employee SignIn
 router.post("/signin", async (req, res) => {
   try {
     const { email, password } = req.body;
-    const employee = await EmployeeDetails.findOne({ email });
 
-    if (!employee) return res.status(400).json({ message: "Employee not found" });
+    // Check if employee exists
+    const employee = await Employee.findOne({ email });
+    if (!employee) {
+      return res.status(400).json({ message: "Employee not found" });
+    }
 
-    const isMatch = await bcrypt.compare(password, employee.password);
-    if (!isMatch) return res.status(400).json({ message: "Invalid credentials" });
+    // Check password (simple check, should use bcrypt in production)
+    if (employee.password !== password) {
+      return res.status(400).json({ message: "Invalid Credentials" });
+    }
 
-    const token = jwt.sign({ id: employee._id }, process.env.JWT_SECRET, { expiresIn: "1h" });
-    res.json({ message: "Employee login successful", token });
-  } catch (error) {
-    res.status(500).json({ message: "Server error", error: error.message });
+    res.json({ message: "Employee Sign In Successful", employee });
+  } catch (err) {
+    res.status(500).json({ message: "Server Error", error: err.message });
   }
 });
 
